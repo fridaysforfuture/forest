@@ -1,0 +1,44 @@
+version: "3"
+services:
+  mongodb:
+    image: mongo
+    hostname: mongo
+    volumes:
+      - ./mongodb:/data/db
+    networks:
+      - internal
+
+  forest-frontend:
+    build: https://github.com/fridaysforfuture/forest-frontend.git
+    hostname: frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./configs/frontend/:/forest-frontend/
+
+  forest-api:
+    build: https://github.com/fridaysforfuture/forest-api.git
+    hostname: api
+    ports:
+      - 3001:3001
+    networks:
+      - internal
+    volumes:
+      - ./configs/api/:/forest-api/
+
+  forest-render:
+    build: https://github.com/fridaysforfuture/forest-render.git
+    hostname: render
+    ports:
+      - 3002:3002
+    networks:
+      - internal
+    environment:
+      - MONGO_HOST=mongo
+      - API_HOST=api
+    volumes:
+      - ./configs/render/assets/:/forest-render/assets/
+      - ./configs/render/:/forest-render/config/
+
+networks:
+  internal:
